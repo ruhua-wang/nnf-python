@@ -118,7 +118,7 @@ class TestVGG16Model(object):
         #sel.val_col_indices = np.uint8(np.array([6]))
         #sel.te_col_indices = np.uint8(np.array([7]))
         sel.te_col_indices = np.uint8(np.array([0, 1, 2, 3, 4, 5,6, 7]))
-        sel.class_range = np.uint8(np.arange(0, 10))
+        sel.class_range = np.uint8(np.arange(0, 100))
         #[nndb_tr, nndb_val, nndb_te, _, _, _, _] = DbSlice.slice(nndb, sel)
 
         # define a data workspace to work with disk database
@@ -153,7 +153,7 @@ class TestVGG16Model(object):
                 'iter_param': {'class_mode':'categorical',
                                 'batch_size':100
                                 },
-                'iter_pp_param': {'rescale':1./255, 'nrm_vgg16':True},
+                'iter_pp_param': {'rescale':1./255, 'normalize_vgg16':True},
                 'iter_in_mem': True}
 
         return dbparam1
@@ -202,8 +202,13 @@ class TestVGG16Model(object):
     @staticmethod
     def _fn_predict(nnmodel, nnpatch, predictions, true_output):
         #pass
-
-        nndb_fe = NNdb('features', predictions[1], 8, True, cls_lbl=None, format=Format.N_H)
+        from keras.utils import np_utils
+        np.array(true_output).reshape(-1,100)
+        uniques, ids = np.unique(true_output, return_inverse=True)
+        y_code = np_utils.to_categorical(ids, len(uniques))
+        cls_lbl = uniques[true_output.argmax(1)]
+        
+        nndb_fe = NNdb('features', predictions[1], 8, False, cls_lbl=cls_lbl, format=Format.N_H)
         sel_fe = Selection()
         sel_fe.use_rgb = False
         sel_fe.tr_col_indices      = np.array([0, 2, 3, 5], dtype='uint8')
