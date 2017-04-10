@@ -54,10 +54,16 @@ class ImageDataPreProcessor(ImageDataGenerator):
     def standardize(self, x):
         """Standardize data sample."""
         if (self.nrm_vgg16):
-            x[0, :, :] -= 103.939
-            x[1, :, :] -= 116.779
-            x[2, :, :] -= 123.68
-
+            # 'RGB'->'BGR'
+            x = x[:, :, :, ::-1]
+            ## Zero-center by mean pixel
+            #x[0, :, :] -= 103.939
+            #x[1, :, :] -= 116.779
+            #x[2, :, :] -= 123.68
+            # Zero-center by mean pixel
+            x[:, :, :, 0] -= 103.939
+            x[:, :, :, 1] -= 116.779
+            x[:, :, :, 2] -= 123.68
         return super().standardize(x)
 
     def flow(self, X, y=None, nb_class=None, params=None):

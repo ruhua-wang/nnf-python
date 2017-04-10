@@ -817,6 +817,10 @@ class NNModel(object):
         if (cfg.feature_layers is None): 
             return
 
+        # TODO:
+        # if feature_layers is scalar
+        #   feature_layers = [feature_layers]
+
         for i, f_idx in enumerate(cfg.feature_layers):
             f_layer = self.net.layers[f_idx]
 
